@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+
+# Distribution
+dist/
+build/
+*.egg-info/
+*.egg
+
+# Environment
+.env
+.env.local
+.venv/key
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Lock files (optional, uncomment if needed)
+# uv.lock
