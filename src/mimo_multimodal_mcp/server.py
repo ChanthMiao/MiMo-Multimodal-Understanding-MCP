@@ -199,8 +199,7 @@ async def _call_mimo(
     prompt: str,
     media_type: str,
     system_prompt: str | None = None,
-    temperature: float = 0.7,
-    max_tokens: int = 1024,
+    max_tokens: int = 32768,
 ) -> str:
     """Call MiMo API with media content."""
     media_content.append({"type": "text", "text": prompt})
@@ -215,7 +214,6 @@ async def _call_mimo(
                 {"role": "system", "content": sys_content},
                 {"role": "user", "content": media_content},
             ],
-            temperature=temperature,
             max_completion_tokens=max_tokens,
         )
         message = completion.choices[0].message
@@ -232,7 +230,6 @@ async def understand_image(
     image_urls: list[str] | None = None,
     image_paths: list[str] | None = None,
     system_prompt: str | None = None,
-    temperature: float = 0.7,
     max_tokens: int = 32768,
 ) -> str:
     """调用小米 MIMO 多模态模型理解图片。
@@ -246,7 +243,6 @@ async def understand_image(
         image_urls: 多张网络图片 URL
         image_paths: 多张本地图片路径
         system_prompt: 可选系统提示词
-        temperature: 输出随机性，越低越稳定
         max_tokens: 最大输出长度
 
     Returns:
@@ -260,7 +256,7 @@ async def understand_image(
     if not image_content:
         return "Error: No image provided. Please provide at least one image via image_url, image_path, image_urls, or image_paths."
 
-    return await _call_mimo(image_content, prompt, "image", system_prompt, temperature, max_tokens)
+    return await _call_mimo(image_content, prompt, "image", system_prompt, max_tokens)
 
 
 @mcp.tool()
@@ -271,7 +267,6 @@ async def understand_audio(
     audio_urls: list[str] | None = None,
     audio_paths: list[str] | None = None,
     system_prompt: str | None = None,
-    temperature: float = 0.7,
     max_tokens: int = 32768,
 ) -> str:
     """调用小米 MIMO 多模态模型理解音频。
@@ -288,7 +283,6 @@ async def understand_audio(
         audio_urls: 多个网络音频 URL
         audio_paths: 多个本地音频文件路径
         system_prompt: 可选系统提示词
-        temperature: 输出随机性，越低越稳定
         max_tokens: 最大输出长度
 
     Returns:
@@ -302,7 +296,7 @@ async def understand_audio(
     if not audio_content:
         return "Error: No audio provided. Please provide at least one audio via audio_url, audio_path, audio_urls, or audio_paths."
 
-    return await _call_mimo(audio_content, prompt, "audio", system_prompt, temperature, max_tokens)
+    return await _call_mimo(audio_content, prompt, "audio", system_prompt, max_tokens)
 
 
 @mcp.tool()
@@ -315,7 +309,6 @@ async def understand_video(
     fps: float = 2.0,
     media_resolution: str = "default",
     system_prompt: str | None = None,
-    temperature: float = 0.7,
     max_tokens: int = 32768,
 ) -> str:
     """调用小米 MIMO 多模态模型理解视频。
@@ -334,7 +327,6 @@ async def understand_video(
         fps: 每秒抽帧数，范围 [0.1, 10]，默认 2。越高时序越精细
         media_resolution: 视频帧分辨率档次，"default" 或 "max"
         system_prompt: 可选系统提示词
-        temperature: 输出随机性，越低越稳定
         max_tokens: 最大输出长度
 
     Returns:
@@ -350,7 +342,7 @@ async def understand_video(
     if not video_content:
         return "Error: No video provided. Please provide at least one video via video_url, video_path, video_urls, or video_paths."
 
-    return await _call_mimo(video_content, prompt, "video", system_prompt, temperature, max_tokens)
+    return await _call_mimo(video_content, prompt, "video", system_prompt, max_tokens)
 
 
 def main():
