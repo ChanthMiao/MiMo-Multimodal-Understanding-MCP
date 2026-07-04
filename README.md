@@ -32,6 +32,20 @@ export MIMO_API_KEY=your_api_key_here
 
 Get your API key from: https://platform.xiaomimimo.com
 
+### 3. (Optional) Configure API Base URL
+
+By default, the server uses `https://api.xiaomimimo.com/v1`. To use a different API endpoint:
+
+```bash
+export MIMO_API_BASE=https://your-custom-endpoint/v1
+```
+
+Or add it to your `.env` file:
+
+```
+MIMO_API_BASE=https://your-custom-endpoint/v1
+```
+
 ## Usage
 
 ### Quick Start (with uvx)
