@@ -41,6 +41,11 @@ def _image_to_base64_url(image_path: str) -> str:
     if not path.exists():
         raise FileNotFoundError(f"Image file not found: {image_path}")
 
+    file_size = path.stat().st_size
+    max_size = 10 * 1024 * 1024  # 10MB
+    if file_size > max_size:
+        raise ValueError(f"Image file too large: {file_size / 1024 / 1024:.1f}MB (max 10MB)")
+
     mime_type = mimetypes.guess_type(str(path))[0]
     if not mime_type or not mime_type.startswith("image/"):
         mime_type = "image/png"
@@ -84,7 +89,7 @@ def _build_image_content(
                     "type": "image_url",
                     "image_url": {"url": u},
                 })
-    except FileNotFoundError as e:
+    except (FileNotFoundError, ValueError) as e:
         return f"Error: {e}"
 
     return content
