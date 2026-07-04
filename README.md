@@ -105,7 +105,7 @@ Analyze images using Xiaomi MiMo multimodal model.
 | `image_urls` | list[string] | No | Multiple image URLs |
 | `image_paths` | list[string] | No | Multiple local image file paths |
 | `system_prompt` | string | No | Custom system prompt |
-| `max_tokens` | integer | No | Max output length (default: 32768) |
+| `max_tokens` | integer | No | Max output length (default: 8192, max: 32768) |
 
 **Supported formats**: JPEG, PNG, GIF, WebP
 **Size limit**: 10MB
@@ -122,7 +122,7 @@ Analyze audio using Xiaomi MiMo multimodal model.
 | `audio_urls` | list[string] | No | Multiple audio URLs |
 | `audio_paths` | list[string] | No | Multiple local audio file paths |
 | `system_prompt` | string | No | Custom system prompt |
-| `max_tokens` | integer | No | Max output length (default: 32768) |
+| `max_tokens` | integer | No | Max output length (default: 8192, max: 32768) |
 
 **Supported formats**: MP3, WAV, FLAC, M4A, OGG
 **Size limit**: URL 100MB, Base64 50MB
@@ -141,7 +141,7 @@ Analyze video using Xiaomi MiMo multimodal model.
 | `fps` | float | No | Frames per second, range [0.1, 10], default: 2 |
 | `media_resolution` | string | No | Resolution: "default" or "max" |
 | `system_prompt` | string | No | Custom system prompt |
-| `max_tokens` | integer | No | Max output length (default: 32768) |
+| `max_tokens` | integer | No | Max output length (default: 8192, max: 32768) |
 
 **Supported formats**: MP4, MOV, AVI, WMV
 **Size limit**: URL 300MB, Base64 50MB

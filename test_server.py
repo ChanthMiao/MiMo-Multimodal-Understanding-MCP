@@ -59,7 +59,6 @@ async def test_live():
     result = await understand_image(
         prompt="请描述这张图片的内容",
         image_url="https://example-files.cnbj1.mi-fds.com/example-files/image/image_example.png",
-        max_tokens=512
     )
     print(f"✓ Image API Response:\n{result}\n")
 
@@ -67,7 +66,6 @@ async def test_live():
     result = await understand_audio(
         prompt="请转录这段音频的内容",
         audio_url="https://example-files.cnbj1.mi-fds.com/example-files/audio/audio_example.wav",
-        max_tokens=512
     )
     print(f"✓ Audio API Response:\n{result}\n")
 
@@ -75,7 +73,6 @@ async def test_live():
     result = await understand_video(
         prompt="请描述这段视频的内容",
         video_url="https://example-files.cnbj1.mi-fds.com/example-files/video/video_example.mp4",
-        max_tokens=2048
     )
     print(f"✓ Video API Response:\n{result}")
 

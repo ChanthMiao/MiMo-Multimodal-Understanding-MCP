@@ -199,7 +199,7 @@ async def _call_mimo(
     prompt: str,
     media_type: str,
     system_prompt: str | None = None,
-    max_tokens: int = 32768,
+    max_tokens: int = 8192,
 ) -> str:
     """Call MiMo API with media content."""
     media_content.append({"type": "text", "text": prompt})
@@ -217,7 +217,11 @@ async def _call_mimo(
             max_completion_tokens=max_tokens,
         )
         message = completion.choices[0].message
-        return message.content or message.reasoning_content or ""
+        if message.content:
+            return message.content
+        if message.reasoning_content:
+            return f"[Warning] Model returned reasoning but no final content. Try increasing max_tokens (current: {max_tokens}).\n\nReasoning preview:\n{message.reasoning_content[:500]}"
+        return ""
     except Exception as e:
         return f"Error calling MiMo API: {e}"
 
@@ -230,7 +234,7 @@ async def understand_image(
     image_urls: list[str] | None = None,
     image_paths: list[str] | None = None,
     system_prompt: str | None = None,
-    max_tokens: int = 32768,
+    max_tokens: int = 8192,
 ) -> str:
     """调用小米 MIMO 多模态模型理解图片。
 
@@ -243,7 +247,7 @@ async def understand_image(
         image_urls: 多张网络图片 URL
         image_paths: 多张本地图片路径
         system_prompt: 可选系统提示词
-        max_tokens: 最大输出长度
+        max_tokens: 最大输出长度 (默认 8192，最大 32768)
 
     Returns:
         MIMO 模型返回的图片理解结果。
@@ -267,7 +271,7 @@ async def understand_audio(
     audio_urls: list[str] | None = None,
     audio_paths: list[str] | None = None,
     system_prompt: str | None = None,
-    max_tokens: int = 32768,
+    max_tokens: int = 8192,
 ) -> str:
     """调用小米 MIMO 多模态模型理解音频。
 
@@ -283,7 +287,7 @@ async def understand_audio(
         audio_urls: 多个网络音频 URL
         audio_paths: 多个本地音频文件路径
         system_prompt: 可选系统提示词
-        max_tokens: 最大输出长度
+        max_tokens: 最大输出长度 (默认 8192，最大 32768)
 
     Returns:
         MIMO 模型返回的音频理解结果。
@@ -309,7 +313,7 @@ async def understand_video(
     fps: float = 2.0,
     media_resolution: str = "default",
     system_prompt: str | None = None,
-    max_tokens: int = 32768,
+    max_tokens: int = 8192,
 ) -> str:
     """调用小米 MIMO 多模态模型理解视频。
 
@@ -327,7 +331,7 @@ async def understand_video(
         fps: 每秒抽帧数，范围 [0.1, 10]，默认 2。越高时序越精细
         media_resolution: 视频帧分辨率档次，"default" 或 "max"
         system_prompt: 可选系统提示词
-        max_tokens: 最大输出长度
+        max_tokens: 最大输出长度 (默认 8192，最大 32768)
 
     Returns:
         MIMO 模型返回的视频理解结果。
