@@ -48,7 +48,7 @@ async def test_server():
 
 async def test_live():
     """Test with actual API call (requires MIMO_API_KEY)."""
-    from mimo_multimodal_mcp.server import understand_image, understand_audio
+    from mimo_multimodal_mcp.server import understand_image, understand_audio, understand_video
 
     api_key = os.environ.get("MIMO_API_KEY")
     if not api_key or api_key == "test":
@@ -69,7 +69,15 @@ async def test_live():
         audio_url="https://example-files.cnbj1.mi-fds.com/example-files/audio/audio_example.wav",
         max_tokens=512
     )
-    print(f"✓ Audio API Response:\n{result}")
+    print(f"✓ Audio API Response:\n{result}\n")
+
+    print("Testing video understanding with live API...")
+    result = await understand_video(
+        prompt="请描述这段视频的内容",
+        video_url="https://example-files.cnbj1.mi-fds.com/example-files/video/video_example.mp4",
+        max_tokens=512
+    )
+    print(f"✓ Video API Response:\n{result}")
 
 
 if __name__ == "__main__":
