@@ -32,8 +32,8 @@ DEFAULT_SYSTEM_PROMPTS = {
 
 MAX_SIZES = {
     "image": 10 * 1024 * 1024,    # 10MB
-    "audio": 100 * 1024 * 1024,   # 100MB (URL) / 50MB (base64)
-    "video": 300 * 1024 * 1024,   # 300MB (URL) / 50MB (base64)
+    "audio": 50 * 1024 * 1024,    # 50MB (base64 limit)
+    "video": 50 * 1024 * 1024,    # 50MB (base64 limit)
 }
 
 
