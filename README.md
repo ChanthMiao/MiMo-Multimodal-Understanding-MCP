@@ -32,21 +32,14 @@ export MIMO_API_KEY=your_api_key_here
 
 Get your API key from: https://platform.xiaomimimo.com
 
-### 3. (Optional) Configure API Base URL
+## Usage
 
-By default, the server uses `https://api.xiaomimimo.com/v1`. To use a different API endpoint:
+### Quick Start (with uvx)
 
 ```bash
-export MIMO_API_BASE=https://your-custom-endpoint/v1
+export MIMO_API_KEY=your_api_key_here
+uvx mimo-multimodal-mcp
 ```
-
-Or add it to your `.env` file:
-
-```
-MIMO_API_BASE=https://your-custom-endpoint/v1
-```
-
-## Usage
 
 ### Development mode (with MCP Inspector)
 
@@ -64,6 +57,24 @@ uv run mcp install src/mimo_multimodal_mcp/server.py
 
 ```bash
 uv run python src/mimo_multimodal_mcp/server.py
+```
+
+### Claude Desktop Configuration
+
+Add to `~/.config/claude/claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "mimo-multimodal": {
+      "command": "uvx",
+      "args": ["mimo-multimodal-mcp"],
+      "env": {
+        "MIMO_API_KEY": "your_api_key_here"
+      }
+    }
+  }
+}
 ```
 
 ## Tools
