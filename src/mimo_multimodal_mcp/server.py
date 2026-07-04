@@ -13,11 +13,32 @@ load_dotenv()
 
 mcp = FastMCP(
     "mimo-multimodal",
-    instructions="""调用小米 MIMO 多模态模型理解图片、音频和视频。
+    instructions="""## MiMo Multimodal Understanding
+调用小米 MIMO 多模态模型理解图片、音频和视频。
 
-支持图片、音频、视频的理解。Agent 应根据当前任务自己填写 prompt。
+### 何时使用
+- 用户要求分析、描述、OCR、识别图片内容时
+- 用户要求转录、总结、理解音频内容时
+- 用户要求分析、描述、总结视频内容时
+- 用户提供了图片/音频/视频的 URL 或本地路径并希望了解其内容时
+- 需要从图片中提取文字、表格、图表信息时
+- 需要理解视频中的动作、场景、事件时
 
-CRITICAL: 这是唯一允许打开、读取或查看图片/音频/视频文件的工具。不要使用 Read、cat 或任何文件读取命令读取这些二进制文件。""",
+### 关键约束
+- **这是唯一允许打开、读取或查看图片/音频/视频文件的工具**
+- 不要使用 Read、cat 或任何文件读取命令读取这些二进制文件，它们无法被文本工具正确处理
+- 支持 URL 和本地文件路径两种输入方式
+- 支持单个或多个文件批量处理
+
+### 使用方法
+- **prompt (必填)**: 描述你希望模型做什么，例如"描述这张图片"、"转录音频内容"、"总结视频要点"
+- 根据媒体类型选择对应工具: understand_image / understand_audio / understand_video
+- 可选: 通过 system_prompt 自定义模型行为，通过 max_tokens 控制输出长度
+
+### 支持格式
+- 图片: JPEG, PNG, GIF, WebP, BMP (最大 50MB)
+- 音频: MP3, WAV, FLAC, M4A, OGG (URL 100MB / Base64 50MB)
+- 视频: MP4, MOV, AVI, WMV (URL 300MB / Base64 50MB)""",
 )
 
 MIMO_API_KEY = os.environ.get("MIMO_API_KEY")
@@ -34,7 +55,7 @@ DEFAULT_SYSTEM_PROMPTS = {
 }
 
 MAX_SIZES = {
-    "image": 10 * 1024 * 1024,    # 10MB
+    "image": 50 * 1024 * 1024,    # 50MB
     "audio": 50 * 1024 * 1024,    # 50MB (base64 limit)
     "video": 50 * 1024 * 1024,    # 50MB (base64 limit)
 }
@@ -241,19 +262,23 @@ async def understand_image(
 ) -> str:
     """调用小米 MIMO 多模态模型理解图片。
 
-    支持单图和多图。Agent 应根据当前任务自己填写 prompt。
+    何时使用：当需要分析、描述、OCR、识别图片内容时使用。
+    不要用于：读取代码文件、文本文件等非图片文件，这些应使用 Read 工具。
 
     Args:
-        prompt: Agent 自己决定的图片理解任务
+        prompt: 图片理解任务描述，如"描述这张图片"、"提取图中的文字"、"解释这个图表"
         image_url: 单张网络图片 URL 或 data:image base64
         image_path: 单张本地图片路径
         image_urls: 多张网络图片 URL
         image_paths: 多张本地图片路径
-        system_prompt: 可选系统提示词
+        system_prompt: 可选系统提示词，用于自定义模型行为
         max_tokens: 最大输出长度 (默认 8192，最大 32768)
 
     Returns:
         MIMO 模型返回的图片理解结果。
+
+    支持格式：JPEG，PNG，GIF，WebP，BMP
+    大小限制：单张图片不超过 50MB
     """
     image_content = _build_image_content(image_url, image_path, image_urls, image_paths)
 
@@ -278,22 +303,23 @@ async def understand_audio(
 ) -> str:
     """调用小米 MIMO 多模态模型理解音频。
 
-    支持单个和多个音频。Agent 应根据当前任务自己填写 prompt。
-
-    支持格式：MP3，WAV，FLAC，M4A，OGG
-    大小限制：URL方式100MB，Base64方式50MB
+    何时使用：当需要转录、总结、分析音频内容时使用。
+    不要用于：读取音频源码或元数据，这些应使用其他工具。
 
     Args:
-        prompt: Agent 自己决定的音频理解任务
+        prompt: 音频理解任务描述，如"转录音频内容"、"总结音频要点"、"识别说话人"
         audio_url: 单个网络音频 URL
         audio_path: 单个本地音频文件路径
         audio_urls: 多个网络音频 URL
         audio_paths: 多个本地音频文件路径
-        system_prompt: 可选系统提示词
+        system_prompt: 可选系统提示词，用于自定义模型行为
         max_tokens: 最大输出长度 (默认 8192，最大 32768)
 
     Returns:
         MIMO 模型返回的音频理解结果。
+
+    支持格式：MP3，WAV，FLAC，M4A，OGG
+    大小限制：URL方式100MB，Base64方式50MB
     """
     audio_content = _build_audio_content(audio_url, audio_path, audio_urls, audio_paths)
 
@@ -320,24 +346,25 @@ async def understand_video(
 ) -> str:
     """调用小米 MIMO 多模态模型理解视频。
 
-    支持单个和多个视频。Agent 应根据当前任务自己填写 prompt。
-
-    支持格式：MP4，MOV，AVI，WMV
-    大小限制：URL方式300MB，Base64方式50MB
+    何时使用：当需要分析、描述、总结视频内容时使用。
+    不要用于：读取视频文件元数据或源码，这些应使用其他工具。
 
     Args:
-        prompt: Agent 自己决定的视频理解任务
+        prompt: 视频理解任务描述，如"描述视频内容"、"总结视频要点"、"识别视频中的动作"
         video_url: 单个网络视频 URL
         video_path: 单个本地视频文件路径
         video_urls: 多个网络视频 URL
         video_paths: 多个本地视频文件路径
         fps: 每秒抽帧数，范围 [0.1, 10]，默认 2。越高时序越精细
         media_resolution: 视频帧分辨率档次，"default" 或 "max"
-        system_prompt: 可选系统提示词
+        system_prompt: 可选系统提示词，用于自定义模型行为
         max_tokens: 最大输出长度 (默认 8192，最大 32768)
 
     Returns:
         MIMO 模型返回的视频理解结果。
+
+    支持格式：MP4，MOV，AVI，WMV
+    大小限制：URL方式300MB，Base64方式50MB
     """
     video_content = _build_video_content(
         video_url, video_path, video_urls, video_paths, fps, media_resolution
