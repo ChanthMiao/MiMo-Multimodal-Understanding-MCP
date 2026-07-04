@@ -1,13 +1,12 @@
-# MiMo Image Understanding MCP Server
+# MiMo Multimodal Understanding MCP Server
 
-MCP server for Xiaomi MiMo image understanding API.
+MCP server for Xiaomi MiMo multimodal understanding API (image, audio, video).
 
 ## Features
 
-- Support single and multiple images
-- Support image URL and local file paths
-- Support Base64 encoded images
-- Customizable system prompt, temperature, and max tokens
+- **Image Understanding**: Single/multiple images, URL and local file support
+- **Audio Understanding**: Single/multiple audio, URL and local file support
+- **Video Understanding**: Single/multiple video, URL and local file support, configurable fps and resolution
 
 ## Setup
 
@@ -38,28 +37,26 @@ Get your API key from: https://platform.xiaomimimo.com
 ### Development mode (with MCP Inspector)
 
 ```bash
-uv run mcp dev src/mimo_image_mcp/server.py
+uv run mcp dev src/mimo_multimodal_mcp/server.py
 ```
 
 ### Install to Claude Desktop
 
 ```bash
-uv run mcp install src/mimo_image_mcp/server.py
+uv run mcp install src/mimo_multimodal_mcp/server.py
 ```
 
 ### Direct execution
 
 ```bash
-uv run python src/mimo_image_mcp/server.py
+uv run python src/mimo_multimodal_mcp/server.py
 ```
 
-## Tool
+## Tools
 
 ### `understand_image`
 
 Analyze images using Xiaomi MiMo multimodal model.
-
-**Parameters:**
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
@@ -72,8 +69,83 @@ Analyze images using Xiaomi MiMo multimodal model.
 | `temperature` | float | No | Output randomness (default: 0.7) |
 | `max_tokens` | integer | No | Max output length (default: 1024) |
 
-**Example usage in Claude:**
+**Supported formats**: JPEG, PNG, GIF, WebP
+**Size limit**: 10MB
 
-- "Describe this image: https://example.com/image.jpg"
-- "What text is in this screenshot? /path/to/screenshot.png"
-- "Compare these two images: [url1] [url2]"
+### `understand_audio`
+
+Analyze audio using Xiaomi MiMo multimodal model.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `prompt` | string | Yes | Audio understanding task description |
+| `audio_url` | string | No | Single audio URL |
+| `audio_path` | string | No | Single local audio file path |
+| `audio_urls` | list[string] | No | Multiple audio URLs |
+| `audio_paths` | list[string] | No | Multiple local audio file paths |
+| `system_prompt` | string | No | Custom system prompt |
+| `temperature` | float | No | Output randomness (default: 0.7) |
+| `max_tokens` | integer | No | Max output length (default: 1024) |
+
+**Supported formats**: MP3, WAV, FLAC, M4A, OGG
+**Size limit**: URL 100MB, Base64 50MB
+
+### `understand_video`
+
+Analyze video using Xiaomi MiMo multimodal model.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `prompt` | string | Yes | Video understanding task description |
+| `video_url` | string | No | Single video URL |
+| `video_path` | string | No | Single local video file path |
+| `video_urls` | list[string] | No | Multiple video URLs |
+| `video_paths` | list[string] | No | Multiple local video file paths |
+| `fps` | float | No | Frames per second, range [0.1, 10], default: 2 |
+| `media_resolution` | string | No | Resolution: "default" or "max" |
+| `system_prompt` | string | No | Custom system prompt |
+| `temperature` | float | No | Output randomness (default: 0.7) |
+| `max_tokens` | integer | No | Max output length (default: 1024) |
+
+**Supported formats**: MP4, MOV, AVI, WMV
+**Size limit**: URL 300MB, Base64 50MB
+
+## Examples
+
+### Image Understanding
+
+```python
+# URL
+await understand_image(prompt="Describe this image", image_url="https://example.com/image.jpg")
+
+# Local file
+await understand_image(prompt="What text is in this?", image_path="/path/to/screenshot.png")
+
+# Multiple images
+await understand_image(prompt="Compare these", image_urls=["url1", "url2"])
+```
+
+### Audio Understanding
+
+```python
+# URL
+await understand_audio(prompt="Transcribe this audio", audio_url="https://example.com/audio.wav")
+
+# Local file
+await understand_audio(prompt="What is being said?", audio_path="/path/to/audio.mp3")
+```
+
+### Video Understanding
+
+```python
+# URL with default settings
+await understand_video(prompt="Describe this video", video_url="https://example.com/video.mp4")
+
+# URL with custom fps and resolution
+await understand_video(
+    prompt="Describe the action",
+    video_url="https://example.com/video.mp4",
+    fps=5.0,
+    media_resolution="max"
+)
+```

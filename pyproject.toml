@@ -1,7 +1,7 @@
 [project]
-name = "mimo-image-mcp"
-version = "0.1.0"
-description = "MCP server for Xiaomi MiMo image understanding"
+name = "mimo-multimodal-mcp"
+version = "0.2.0"
+description = "MCP server for Xiaomi MiMo multimodal understanding (image, audio, video)"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
@@ -11,11 +11,11 @@ dependencies = [
 ]
 
 [project.scripts]
-mimo-image-mcp = "mimo_image_mcp.server:main"
+mimo-multimodal-mcp = "mimo_multimodal_mcp.server:main"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/mimo_image_mcp"]
+packages = ["src/mimo_multimodal_mcp"]
