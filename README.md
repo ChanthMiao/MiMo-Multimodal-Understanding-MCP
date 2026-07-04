@@ -34,7 +34,14 @@ Get your API key from: https://platform.xiaomimimo.com
 
 ### 3. (Optional) Configure API Base URL
 
-By default, the server uses `https://api.xiaomimimo.com/v1`. To use a different API endpoint:
+The default API endpoint is determined by your API key prefix:
+
+| Key Prefix | Default Endpoint |
+|------------|------------------|
+| `tp-*` | `https://token-plan-cn.xiaomimimo.com/v1` |
+| `sk-*` or others | `https://api.xiaomimimo.com/v1` |
+
+To use a different API endpoint:
 
 ```bash
 export MIMO_API_BASE=https://your-custom-endpoint/v1
