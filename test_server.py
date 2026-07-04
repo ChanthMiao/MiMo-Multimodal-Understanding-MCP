@@ -75,7 +75,7 @@ async def test_live():
     result = await understand_video(
         prompt="请描述这段视频的内容",
         video_url="https://example-files.cnbj1.mi-fds.com/example-files/video/video_example.mp4",
-        max_tokens=512
+        max_tokens=2048
     )
     print(f"✓ Video API Response:\n{result}")
 

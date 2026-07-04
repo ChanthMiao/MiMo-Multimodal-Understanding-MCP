@@ -316,7 +316,7 @@ async def understand_video(
     media_resolution: str = "default",
     system_prompt: str | None = None,
     temperature: float = 0.7,
-    max_tokens: int = 1024,
+    max_tokens: int = 2048,
 ) -> str:
     """调用小米 MIMO 多模态模型理解视频。
 
