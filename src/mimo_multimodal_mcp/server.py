@@ -16,6 +16,12 @@ mcp = FastMCP(
     instructions="""## MiMo Multimodal Understanding
 调用小米 MIMO 多模态模型理解图片、音频和视频。
 
+### ⚠️ 优先规则：模型内建能力优先
+当宿主模型本身是 mimo-v2.5（或其他小米 MiMo 多模态模型）时，**禁止调用本 MCP 的任何工具**。
+该模型已原生支持图片、音频、视频理解，直接使用模型内置能力即可，无需通过外部 API 再次调用同款模型。
+判断依据：检查系统提示中是否明确提到 "model named mimo-v2.5"、"xiaomi-token-plan-cn/mimo-v2.5" 或类似标识。
+如果你确认自己就是 mimo-v2.5，请直接处理用户的多模态任务，不要调用 understand_image / understand_audio / understand_video。
+
 ### 何时使用
 - 用户要求分析、描述、OCR、识别图片内容时
 - 用户要求转录、总结、理解音频内容时
