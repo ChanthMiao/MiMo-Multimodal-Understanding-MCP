@@ -6,13 +6,14 @@ import os
 from pathlib import Path
 
 from dotenv import load_dotenv
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 from openai import OpenAI
 
 load_dotenv()
 
-mcp = FastMCP(
+mcp = MCPServer(
     "mimo-multimodal",
+    version="0.6.0",
     instructions="""## MiMo Multimodal Understanding
 调用小米 MIMO 多模态模型理解图片、音频和视频。
 
