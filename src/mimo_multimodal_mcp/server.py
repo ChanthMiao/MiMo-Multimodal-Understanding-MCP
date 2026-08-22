@@ -13,7 +13,7 @@ load_dotenv()
 
 mcp = MCPServer(
     "mimo-multimodal",
-    version="0.6.0",
+    version="0.6.1",
     instructions="""## MiMo Multimodal Understanding
 调用小米 MIMO 多模态模型理解图片、音频和视频。
 
