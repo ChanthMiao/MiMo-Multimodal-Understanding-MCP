@@ -84,9 +84,22 @@ def _file_to_base64_url(file_path: str, media_type: str) -> str:
 
     file_size = path.stat().st_size
     max_size = MAX_SIZES.get(media_type, 10 * 1024 * 1024)
-    if file_size > max_size:
+
+    # Calculate base64 encoded size (raw_size * 4/3 + padding overhead)
+    base64_size = (file_size * 4 + 2) // 3
+    if base64_size > max_size:
         max_mb = max_size / 1024 / 1024
-        raise ValueError(f"File too large: {file_size / 1024 / 1024:.1f}MB (max {max_mb:.0f}MB)")
+        base64_mb = base64_size / 1024 / 1024
+        # Generate user-friendly error message based on media type
+        filename = path.name
+        if media_type == "image":
+            raise ValueError(f"{filename}图片体积过大（{base64_mb:.1f}MB，限制{max_mb:.0f}MB），请尝试手动压缩")
+        elif media_type == "audio":
+            raise ValueError(f"{filename}音频体积过大（{base64_mb:.1f}MB，限制{max_mb:.0f}MB），请尝试手动压缩")
+        elif media_type == "video":
+            raise ValueError(f"{filename}视频体积过大（{base64_mb:.1f}MB，限制{max_mb:.0f}MB），请尝试手动压缩或分片")
+        else:
+            raise ValueError(f"{filename}文件体积过大（{base64_mb:.1f}MB，限制{max_mb:.0f}MB）")
 
     mime_type = mimetypes.guess_type(str(path))[0]
     if not mime_type:
