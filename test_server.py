@@ -6,10 +6,32 @@ import os
 
 async def test_server():
     """Test the server can be imported and tools are registered."""
-    from mimo_multimodal_mcp.server import mcp, understand_image, understand_audio, understand_video
+    from mimo_multimodal_mcp.server import (
+        DEFAULT_MODEL,
+        MIMO_MODEL,
+        _resolve_model,
+        mcp,
+        understand_image,
+        understand_audio,
+        understand_video,
+    )
 
     print("✓ Server imported successfully")
     print(f"✓ Server name: {mcp.name}")
+    print(f"✓ Default model: {MIMO_MODEL}")
+
+    # Test model resolution
+    assert "v2.5" not in MIMO_MODEL, "Retired V2.5 models must not be used"
+    assert _resolve_model("mimo-v2.6") == "mimo-v2.6-flash"
+    assert _resolve_model("mimo-v2.6-pro") == "mimo-v2.6-pro"
+    assert _resolve_model("mimo-v2.6-flash") == "mimo-v2.6-flash"
+    assert DEFAULT_MODEL == "mimo-v2.6-flash"
+    try:
+        _resolve_model("mimo-v2.5")
+        raise AssertionError("Retired model should be rejected")
+    except ValueError:
+        pass
+    print("✓ Model resolution works")
 
     # Test image tool
     print("\nTesting understand_image tool...")
@@ -20,6 +42,12 @@ async def test_server():
     result = await understand_image(prompt="describe", image_path="/nonexistent/image.png")
     assert "Error" in result or "not found" in result.lower()
     print(f"✓ Invalid path handled: {result[:50]}...")
+
+    result = await understand_image(
+        prompt="describe", image_url="https://example.com/image.png", model="mimo-v2.5"
+    )
+    assert "Unsupported model" in result, "Should reject retired model before API call"
+    print(f"✓ Invalid model handled: {result[:60]}...")
 
     # Test audio tool
     print("\nTesting understand_audio tool...")

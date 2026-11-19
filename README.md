@@ -1,12 +1,28 @@
 # MiMo Multimodal Understanding MCP Server
 
-MCP server for Xiaomi MiMo multimodal understanding API (image, audio, video).
+MCP server for Xiaomi MiMo V2.6 multimodal understanding API (image, audio, video).
+
+> **Note**: `mimo-v2.5` and `mimo-v2.5-pro` were retired on 2026-10-21. This server now targets the MiMo V2.6 series.
 
 ## Features
 
 - **Image Understanding**: Single/multiple images, URL and local file support
 - **Audio Understanding**: Single/multiple audio, URL and local file support
 - **Video Understanding**: Single/multiple video, URL and local file support, configurable fps and resolution
+- **Model Selection**: Choose `mimo-v2.6-pro`, `mimo-v2.6-flash`, or `mimo-v2.6-pro-ultraspeed` per request
+- **Thinking Control**: Enable deep thinking for complex tasks or disable it for low-latency OCR/transcription
+
+## Models
+
+| Model ID | Positioning | Best for |
+|----------|-------------|----------|
+| `mimo-v2.6-pro` | Flagship omni-modal model | Complex projects, long-horizon and high-value tasks |
+| `mimo-v2.6-flash` | Cost-efficient omni-modal model | High-frequency calls and large-scale tasks (default) |
+| `mimo-v2.6-pro-ultraspeed` | Flagship performance with low latency | Real-time / latency-sensitive production workloads |
+
+All V2.6 models accept text, image, audio, and video input, with a 1M-token context window and up to 128K output tokens.
+
+`mimo-v2.6` is a series name rather than a standalone API model ID. For convenience, passing `mimo-v2.6` is treated as an alias for `mimo-v2.6-flash`.
 
 ## Setup
 
@@ -24,7 +40,7 @@ Copy `.env.example` to `.env` and fill in your API key:
 cp .env.example .env
 ```
 
-Or set environment variable directly:
+Or set the environment variable directly:
 
 ```bash
 export MIMO_API_KEY=your_api_key_here
@@ -38,7 +54,7 @@ The default API endpoint is determined by your API key prefix:
 
 | Key Prefix | Default Endpoint |
 |------------|------------------|
-| `tp-*` | `https://token-plan-cn.xiaomimimo.com/v1` |
+| `tp-*` / `ttp-*` | `https://token-plan-cn.xiaomimimo.com/v1` |
 | `sk-*` or others | `https://api.xiaomimimo.com/v1` |
 
 To use a different API endpoint:
@@ -47,11 +63,15 @@ To use a different API endpoint:
 export MIMO_API_BASE=https://your-custom-endpoint/v1
 ```
 
-Or add it to your `.env` file:
+### 4. (Optional) Configure Default Model
 
+The default model is `mimo-v2.6-flash`. Override it with `MIMO_MODEL`:
+
+```bash
+export MIMO_MODEL=mimo-v2.6-pro
 ```
-MIMO_API_BASE=https://your-custom-endpoint/v1
-```
+
+Any per-tool `model` argument takes precedence over `MIMO_MODEL`.
 
 ## Usage
 
@@ -91,7 +111,8 @@ Add to `~/.config/claude/claude_desktop_config.json`:
       "command": "uvx",
       "args": ["mimo-multimodal-mcp"],
       "env": {
-        "MIMO_API_KEY": "your_api_key_here"
+        "MIMO_API_KEY": "your_api_key_here",
+        "MIMO_MODEL": "mimo-v2.6-flash"
       }
     }
   }
@@ -100,9 +121,18 @@ Add to `~/.config/claude/claude_desktop_config.json`:
 
 ## Tools
 
+All three tools share the following optional parameters:
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `system_prompt` | string | No | Custom system prompt |
+| `max_tokens` | integer | No | Max output length including thinking (default: 32768, max: 131072) |
+| `model` | string | No | `mimo-v2.6-pro`, `mimo-v2.6-flash`, or `mimo-v2.6-pro-ultraspeed`; defaults to `MIMO_MODEL` |
+| `thinking` | boolean | No | Enable deep thinking (default: true). Set `false` for low-latency OCR/transcription |
+
 ### `understand_image`
 
-Analyze images using Xiaomi MiMo multimodal model.
+Analyze images using Xiaomi MiMo V2.6 multimodal models.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
@@ -111,32 +141,28 @@ Analyze images using Xiaomi MiMo multimodal model.
 | `image_path` | string | No | Single local image file path |
 | `image_urls` | list[string] | No | Multiple image URLs |
 | `image_paths` | list[string] | No | Multiple local image file paths |
-| `system_prompt` | string | No | Custom system prompt |
-| `max_tokens` | integer | No | Max output length (default: 8192, max: 32768) |
 
-**Supported formats**: JPEG, PNG, GIF, WebP
-**Size limit**: 10MB
+**Supported formats**: JPEG, PNG, GIF, WebP, BMP
+**Size limit**: 50MB (URL or Base64)
 
 ### `understand_audio`
 
-Analyze audio using Xiaomi MiMo multimodal model.
+Analyze audio using Xiaomi MiMo V2.6 multimodal models.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `prompt` | string | Yes | Audio understanding task description |
 | `audio_url` | string | No | Single audio URL |
-| `audio_path` | string | No | Single local audio file path |
+| `audio_path` | string | No | Single local audio file path (sent as Base64 data URL) |
 | `audio_urls` | list[string] | No | Multiple audio URLs |
 | `audio_paths` | list[string] | No | Multiple local audio file paths |
-| `system_prompt` | string | No | Custom system prompt |
-| `max_tokens` | integer | No | Max output length (default: 8192, max: 32768) |
 
 **Supported formats**: MP3, WAV, FLAC, M4A, OGG
 **Size limit**: URL 100MB, Base64 50MB
 
 ### `understand_video`
 
-Analyze video using Xiaomi MiMo multimodal model.
+Analyze video using Xiaomi MiMo V2.6 multimodal models.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
@@ -147,8 +173,6 @@ Analyze video using Xiaomi MiMo multimodal model.
 | `video_paths` | list[string] | No | Multiple local video file paths |
 | `fps` | float | No | Frames per second, range [0.1, 10], default: 2 |
 | `media_resolution` | string | No | Resolution: "default" or "max" |
-| `system_prompt` | string | No | Custom system prompt |
-| `max_tokens` | integer | No | Max output length (default: 8192, max: 32768) |
 
 **Supported formats**: MP4, MOV, AVI, WMV
 **Size limit**: URL 300MB, Base64 50MB
@@ -164,8 +188,19 @@ await understand_image(prompt="Describe this image", image_url="https://example.
 # Local file
 await understand_image(prompt="What text is in this?", image_path="/path/to/screenshot.png")
 
-# Multiple images
-await understand_image(prompt="Compare these", image_urls=["url1", "url2"])
+# Multiple images with the flagship model
+await understand_image(
+    prompt="Compare these",
+    image_urls=["url1", "url2"],
+    model="mimo-v2.6-pro",
+)
+
+# Fast OCR without deep thinking
+await understand_image(
+    prompt="Extract all text",
+    image_path="/path/to/document.png",
+    thinking=False,
+)
 ```
 
 ### Audio Understanding
@@ -189,6 +224,7 @@ await understand_video(
     prompt="Describe the action",
     video_url="https://example.com/video.mp4",
     fps=5.0,
-    media_resolution="max"
+    media_resolution="max",
+    model="mimo-v2.6-pro",
 )
 ```
